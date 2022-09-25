@@ -36,10 +36,6 @@ class HomeActivity : AppCompatActivity(), CategoryItemClickListener, MovieItemIn
         setUpCategoriesRecyclerView()
         setUpMoviePagers()
 
-        moviesPagerHomeViewModel.allMoviesList.observe(this) {
-            moviesPagerAdapter.submitData(lifecycle, it)
-        }
-
     }
 
     private fun setUpCategoriesRecyclerView() {
@@ -60,9 +56,9 @@ class HomeActivity : AppCompatActivity(), CategoryItemClickListener, MovieItemIn
         categories.apply {
             var c = 0
             add(HomeCategoryModel("Home", i == c++))
-            add(HomeCategoryModel("Movies", i == c++))
+            add(HomeCategoryModel("Movie", i == c++))
             add(HomeCategoryModel("Series", i == c++))
-            add(HomeCategoryModel("Episodes", i == c++))
+            add(HomeCategoryModel("Episode", i == c++))
         }
         return categories
     }
@@ -75,18 +71,41 @@ class HomeActivity : AppCompatActivity(), CategoryItemClickListener, MovieItemIn
             header = PageLoaderAdapter(),
             footer = PageLoaderAdapter()
         )
+        moviesPagerHomeViewModel.getCategoryData(
+            "all",
+            "",
+            "2022"
+        )
+        moviesPagerHomeViewModel.allMoviesList?.let { it ->
+            it.observe(this) {
+                moviesPagerAdapter.submitData(lifecycle, it)
+            }
+        }
+
     }
 
     override fun onCategoryItemClickLister(pos: Int) {
         categories.clear()
         categories = getCategoriesList(pos)
+
+        setUpMoviePagers()
+
+        moviesPagerHomeViewModel.getCategoryData(
+            "all",
+            if (pos == 0) "" else categories[pos].title,
+            "2022"
+        )
+        moviesPagerHomeViewModel.allMoviesList?.let { it ->
+            it.observe(this) {
+                moviesPagerAdapter.submitData(lifecycle, it)
+            }
+        }
+
         categoryAdapter.notifyDataSetChanged()
 
     }
 
     override fun onMovieItemClickListener() {
-
-
     }
 
     override fun onMovieBookMarkClickListener() {

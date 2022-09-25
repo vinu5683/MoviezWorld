@@ -4,27 +4,28 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.vinod.moviezworld.mvvm.models.MovieResponse
-import com.vinod.moviezworld.mvvm.models.MoviesResponseModel
-import com.vinod.moviezworld.mvvm.repository.MoviesRepo
+import com.vinod.moviezworld.mvvm.models.SearchItem
+import com.vinod.moviezworld.mvvm.repository.MoviesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 @HiltViewModel
-class MoviesHomeViewModel @Inject constructor(moviesRepo: MoviesRepo) : ViewModel() {
+class MoviesHomeViewModel @Inject constructor(private val moviesRepository: MoviesRepository) : ViewModel() {
 
-    private val _allMoviesList = MutableLiveData<MovieResponse>()
-    val allMoviesList = moviesRepo.getMoviesList().cachedIn(viewModelScope)
+    var allMoviesList: LiveData<PagingData<SearchItem>>? = null
 
-//    fun requestAllMoviesList() {
-//        CoroutineScope(Dispatchers.IO).launch {
-//            _allMoviesList.postValue()
-//        }
-//    }
+
+    fun getCategoryData(searchWord: String, type: String = "", year: String) {
+        viewModelScope.launch {
+            moviesRepository.getMoviesList(searchWord, type, year)
+                .cachedIn(viewModelScope).let {
+                    allMoviesList = it as MutableLiveData<PagingData<SearchItem>>
+                }
+        }
+    }
 
 }

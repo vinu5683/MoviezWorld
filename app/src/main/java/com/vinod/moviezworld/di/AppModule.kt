@@ -1,9 +1,13 @@
 package com.vinod.moviezworld.di
 
+import android.content.Context
+import androidx.room.Room
+import com.vinod.moviezworld.db.MoviesDatabase
 import com.vinod.moviezworld.mvvm.apiserviceproviders.MoviesApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -32,5 +36,11 @@ object AppModule {
     @Singleton
     fun provideMoviesApiService(): MoviesApiService {
         return getRetrofit().create(MoviesApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDatabase(@ApplicationContext context: Context): MoviesDatabase {
+        return Room.databaseBuilder(context, MoviesDatabase::class.java, "movie").build()
     }
 }

@@ -8,25 +8,30 @@ import com.vinod.moviezworld.BuildConfig
 import com.vinod.moviezworld.mvvm.apiserviceproviders.MoviesApiService
 import com.vinod.moviezworld.mvvm.models.SearchItem
 
-class MoviesPagingSource(private val moviesApiService: MoviesApiService) :
-    PagingSource<Int, SearchItem>() {
+class MoviesPagingSource(
+    private val moviesApiService: MoviesApiService,
+    private val searchWord: String,
+    val type: String = "",
+    private val year: String
+) : PagingSource<Int, SearchItem>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, SearchItem> {
 
         return try {
             val position = params.key ?: 1
             val response = moviesApiService.getAllMovies(
-                "all",
-                "2022",
+                searchWord,
+                type,
+                year,
                 BuildConfig.API_KEY,
                 position.toString()
             )
-            Log.d("Taggg",response.toString())
+            Log.d("Taggg", response.toString())
             LoadResult.Page(
                 data = response.search,
                 prevKey = if (position == 1) null else position - 1,
-                nextKey = if (position == (response.totalResults?.toInt()
-                        ?.div(10))
+                nextKey = if (position >= (response.totalResults?.toInt()
+                        ?.div(10)!!)
                 ) null else position + 1
             )
         } catch (e: Exception) {

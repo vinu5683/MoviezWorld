@@ -15,4 +15,13 @@ interface MoviesApiService {
         @Query("apikey") apiKey: String,
         @Query("page") page: String,
     ): MovieResponse
+
+    @GET("/")
+    suspend fun getAllMovies(
+        @Query("s") searchWord: String,
+        @Query("type") type: String,
+        @Query("y") year: String,
+        @Query("apikey") apiKey: String,
+        @Query("page") page: String,
+    ): MovieResponse
 }
